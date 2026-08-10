@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VΛNTAGE FORGE — Dynamic AI Prompt Mutation Engine</title>
+    <meta name="description" content="VΛNTAGE FORGE: Transform simple prompts into complex, structured AI prompts.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash-screen">
+    <video id="splash-video" autoplay muted playsinline disablePictureInPicture controlsList="nodownload nofullscreen noremoteplayback">
+        <source src="https://www.image2url.com/r2/default/videos/1786291089897-ebb8e0c8-c24c-4ee2-9a39-e68b832ac1b5.mp4" type="video/mp4">
+    </video>
+    <div id="splash-logo-wrap">
+        <img id="splash-logo-img"
+             src="https://cdn.phototourl.com/free/2026-08-10-34f0e4ae-4f3f-46af-b48d-3a6a7eb5fdbc.png"
+             alt="VΛNTAGE FORGE"
+             onerror="this.style.display='none';document.getElementById('splash-logo-fallback').style.display='block'">
+        <h1 id="splash-logo-fallback">VΛNTAGE FORGE</h1>
+    </div>
+</div>
+
+<!-- BACKGROUND -->
+<video id="bg-video" autoplay muted loop playsinline disablePictureInPicture controlsList="nodownload nofullscreen noremoteplayback" aria-hidden="true">
+    <source src="https://www.image2url.com/r2/default/videos/1786291905834-cace1863-06d7-42bf-9b0d-e9a75be94a2a.mp4" type="video/mp4">
+</video>
+<div id="bg-overlay" aria-hidden="true"></div>
+<div id="bg-vignette" aria-hidden="true"></div>
+<div id="bg-scanline" aria-hidden="true"></div>
+<canvas id="bg-particles" aria-hidden="true"></canvas>
+<div id="cursor-glow" aria-hidden="true"></div>
+
+<!-- APP -->
+<div id="app" class="app-hidden">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" role="navigation" aria-label="Main navigation">
+        <div class="sidebar-inner">
+            <div class="sidebar-top">
+                <div class="sidebar-logo">
+                    <img class="sidebar-logo-img"
+                         src="https://cdn.phototourl.com/free/2026-08-10-34f0e4ae-4f3f-46af-b48d-3a6a7eb5fdbc.png"
+                         alt="VΛNTAGE FORGE"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                    <div class="sidebar-logo-text">
+                        <span class="logo-v">VΛNTAGE</span>
+                        <span class="logo-f">FORGE</span>
+                    </div>
+                </div>
+                <div class="sidebar-tagline">PROMPT MUTATION ENGINE</div>
+                <nav class="sidebar-nav">
+                    <button class="nav-btn active" data-panel="dashboard" aria-label="Dashboard" aria-current="page">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                        <span class="nav-label">DASHBOARD</span>
+                        <span class="nav-indicator"></span>
+                    </button>
+                    <button class="nav-btn" data-panel="history" aria-label="History">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+                        <span class="nav-label">HISTORY</span>
+                        <span class="nav-indicator"></span>
+                    </button>
+                    <button class="nav-btn" data-panel="settings" aria-label="Settings">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                        <span class="nav-label">SETTINGS</span>
+                        <span class="nav-indicator"></span>
+                    </button>
+                </nav>
+            </div>
+            <div class="sidebar-bottom">
+                <div class="sidebar-status">
+                    <span class="status-dot-sm" id="sidebar-status-dot"></span>
+                    <span class="status-label" id="sidebar-status-label">SYSTEM READY</span>
+                </div>
+                <div class="sidebar-credit">
+                    <div class="credit-by">Made by : <span class="credit-hl">VΛNTAGE</span></div>
+                    <div class="credit-purpose">Bertujuan untuk mengembangkan website dari vibe coder</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <button id="mobile-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+    </button>
+    <div id="sidebar-overlay" aria-hidden="true"></div>
+
+    <!-- MAIN -->
+    <main id="main-content" role="main">
+
+        <header id="status-bar">
+            <div class="status-left">
+                <span class="status-dot" id="status-dot"></span>
+                <span class="status-text" id="status-text">SYSTEM READY</span>
+            </div>
+            <div class="status-right">
+                <span class="status-meta" id="status-time"></span>
+            </div>
+        </header>
+
+        <!-- DASHBOARD -->
+        <section id="panel-dashboard" class="panel active" data-panel="dashboard">
+
+            <div class="video-card-section">
+                <div class="video-card">
+                    <video autoplay muted loop playsinline disablePictureInPicture controlsList="nodownload nofullscreen noremoteplayback">
+                        <source src="https://www.image2url.com/r2/default/videos/1786291391783-8d738f79-929f-4622-831a-9735e72cc89b.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+
+            <!-- API GATE -->
+            <div id="api-gate" class="content-block">
+                <div class="block-header">
+                    <div class="block-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                    </div>
+                    <div class="block-titles">
+                        <h2 class="block-title">OPENROUTER CONNECTION</h2>
+                        <p class="block-sub">Masukkan API key untuk mengaktifkan prompt mutation engine</p>
+                    </div>
+                </div>
+                <div class="api-form">
+                    <div class="input-group">
+                        <label for="api-key-input" class="input-label">API KEY</label>
+                        <div class="input-wrap">
+                            <input type="password" id="api-key-input" placeholder="sk-or-v1-..." autocomplete="off" spellcheck="false" aria-label="OpenRouter API Key">
+                            <button id="toggle-key-vis" class="input-action" type="button" aria-label="Toggle visibility">
+                                <svg class="eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="18" height="18"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                <svg class="eye-hide" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="18" height="18"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="api-form-row">
+                        <label class="checkbox-wrap">
+                            <input type="checkbox" id="remember-key">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">Remember API Key</span>
+                        </label>
+                        <button id="validate-btn" class="btn btn-primary" type="button">
+                            <span class="btn-label">VALIDATE &amp; UNLOCK</span>
+                            <svg class="btn-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-dasharray="60" stroke-dashoffset="20"/></svg>
+                        </button>
+                    </div>
+                    <div id="api-gate-msg" class="gate-msg" aria-live="polite"></div>
+                </div>
+            </div>
+
+            <!-- MAIN FEATURE -->
+            <div id="main-feature" class="feature-locked">
+
+                <!-- PROMPT ENGINE -->
+                <div class="content-block" id="prompt-block">
+                    <div class="block-header">
+                        <div class="block-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        </div>
+                        <div class="block-titles">
+                            <h2 class="block-title">PROMPT ENGINE</h2>
+                            <p class="block-sub">Masukkan prompt yang ingin ditransformasi</p>
+                        </div>
+                    </div>
+                    <div class="engine-controls">
+                        <div class="control-group">
+                            <label class="input-label">OUTPUT MODE</label>
+                            <div class="seg-control" id="output-mode-control">
+                                <button class="seg-btn active" data-value="balanced" type="button">BALANCED</button>
+                                <button class="seg-btn" data-value="strict" type="button">STRICT</button>
+                                <button class="seg-btn" data-value="detailed" type="button">DETAILED</button>
+                                <button class="seg-btn" data-value="extreme" type="button">EXTREME</button>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="input-label" for="engine-style">ENGINE STYLE</label>
+                            <select id="engine-style" aria-label="Engine style">
+                                <option value="principal_engineer">Principal Engineer</option>
+                                <option value="security_architect">Security Architect</option>
+                                <option value="creative_director">Creative Director</option>
+                                <option value="product_architect">Product Architect</option>
+                                <option value="senior_developer">Senior Developer</option>
+                                <option value="research_analyst">Research Analyst</option>
+                                <option value="technical_writer">Technical Writer</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="prompt-input-area">
+                        <textarea id="base-prompt" rows="5" placeholder="Contoh: Buat website e-commerce dengan fitur payment, inventory, dan dashboard admin..." spellcheck="true" aria-label="Base prompt"></textarea>
+                        <div class="prompt-meta-row">
+                            <span class="char-count" id="char-counter">0 characters</span>
+                            <span class="char-warn hidden" id="char-warning">Prompt sangat panjang — processing mungkin lebih lama</span>
+                        </div>
+                    </div>
+                    <div class="file-attach-section">
+                        <div class="file-drop-zone" id="file-drop-zone" role="button" tabindex="0" aria-label="Drop files or click to browse">
+                            <svg class="file-drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            <span class="file-drop-text">DROP FILES HERE</span>
+                            <span class="file-drop-sub">atau click to browse — .txt .md .json .js .py .html .css .ts .sql .csv .xml</span>
+                            <input type="file" id="file-input" multiple accept=".txt,.md,.json,.csv,.html,.css,.js,.ts,.py,.java,.php,.sql,.xml,.yaml,.yml,.toml,.cfg,.ini,.sh,.rb,.go,.rs,.swift,.kt" style="display:none">
+                        </div>
+                        <div class="file-list" id="file-list"></div>
+                        <div class="file-warning hidden" id="file-context-warn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <span>File content may be sent to the AI provider for context.</span>
+                        </div>
+                    </div>
+                    <div class="prompt-actions">
+                        <button id="start-upgrade-btn" class="btn btn-primary btn-lg" type="button" disabled>
+                            <span class="btn-label">MULAI UPGRADE</span>
+                            <svg class="btn-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-dasharray="60" stroke-dashoffset="20"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ANALYSIS -->
+                <div id="analysis-block" class="content-block hidden">
+                    <div class="block-header">
+                        <div class="block-icon icon-cyan">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        </div>
+                        <div class="block-titles">
+                            <h2 class="block-title">AI ANALYSIS</h2>
+                            <p class="block-sub" id="analysis-subtitle">Prompt analyzed</p>
+                        </div>
+                    </div>
+                    <div class="analysis-grid">
+                        <div class="analysis-card"><span class="analysis-label">INTENT</span><span class="analysis-value" id="analysis-intent">—</span></div>
+                        <div class="analysis-card"><span class="analysis-label">DOMAIN</span><span class="analysis-value" id="analysis-domain">—</span></div>
+                        <div class="analysis-card"><span class="analysis-label">COMPLEXITY</span><span class="analysis-value" id="analysis-complexity">—</span></div>
+                        <div class="analysis-card"><span class="analysis-label">OPTIONS</span><span class="analysis-value" id="analysis-options-count">—</span></div>
+                    </div>
+                    <div class="analysis-text" id="analysis-text"></div>
+                    <div class="analysis-missing hidden" id="analysis-missing">
+                        <span class="analysis-label">MISSING INFORMATION</span>
+                        <ul id="analysis-missing-list"></ul>
+                    </div>
+                    <div class="analysis-recommendations hidden" id="analysis-recommendations">
+                        <span class="analysis-label">RECOMMENDATIONS</span>
+                        <ul id="analysis-rec-list"></ul>
+                    </div>
+                    <div class="analysis-file-suggest hidden" id="analysis-file-suggest">
+                        <span class="analysis-label">SUGGESTED FILES</span>
+                        <div id="analysis-file-suggest-list"></div>
+                    </div>
+                </div>
+
+                <!-- PROCESSING -->
+                <div id="processing-block" class="content-block hidden">
+                    <div class="processing-visual">
+                        <div class="processing-ring">
+                            <svg viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="42" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+                                <circle cx="50" cy="50" r="42" fill="none" stroke="#ff6b00" stroke-width="3" stroke-dasharray="264" stroke-dashoffset="200" class="processing-arc"/>
+                            </svg>
+                            <img class="processing-logo"
+                                 src="https://cdn.phototourl.com/free/2026-08-10-34f0e4ae-4f3f-46af-b48d-3a6a7eb5fdbc.png"
+                                 alt=""
+                                 onerror="this.style.display='none'">
+                        </div>
+                        <div class="processing-status" id="processing-status">ANALYZING INTENT</div>
+                        <div class="processing-phase" id="processing-phase"></div>
+                    </div>
+                </div>
+
+                <!-- CONFIG -->
+                <div id="config-block" class="content-block hidden">
+                    <div class="block-header">
+                        <div class="block-icon icon-orange">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+                        </div>
+                        <div class="block-titles">
+                            <h2 class="block-title">DYNAMIC CONFIGURATION</h2>
+                            <p class="block-sub" id="config-subtitle">Configure options to shape the final prompt</p>
+                        </div>
+                    </div>
+                    <div class="config-progress">
+                        <div class="config-progress-bar"><div class="config-progress-fill" id="config-progress-fill"></div></div>
+                        <div class="config-progress-info">
+                            <span id="config-phase-label">PHASE 01</span>
+                            <span id="config-phase-count">1 / 1</span>
+                        </div>
+                    </div>
+                    <div class="phase-tabs" id="phase-tabs"></div>
+                    <div class="options-container" id="options-container"></div>
+                    <div class="custom-req-section">
+                        <button id="add-custom-req" class="btn btn-ghost" type="button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            ADD CUSTOM REQUIREMENT
+                        </button>
+                    </div>
+                    <div id="custom-req-list" class="custom-req-list"></div>
+                    <details class="context-stack" id="context-stack">
+                        <summary class="context-stack-toggle">CONTEXT STACK</summary>
+                        <div class="context-stack-body" id="context-stack-body"></div>
+                    </details>
+                    <div class="config-actions">
+                        <button id="config-prev" class="btn btn-outline" type="button" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg>
+                            BACK
+                        </button>
+                        <button id="auto-config-btn" class="btn btn-ghost" type="button">AUTO CONFIGURE</button>
+                        <button id="config-next" class="btn btn-outline" type="button">
+                            NEXT
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
+                    </div>
+                    <div class="generate-section">
+                        <button id="generate-final-btn" class="btn btn-primary btn-lg" type="button">
+                            <span class="btn-label">GENERATE FINAL PROMPT</span>
+                            <svg class="btn-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-dasharray="60" stroke-dashoffset="20"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CONFLICT -->
+                <div id="conflict-block" class="content-block hidden">
+                    <div class="block-header">
+                        <div class="block-icon icon-warn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        </div>
+                        <div class="block-titles">
+                            <h2 class="block-title">CONFIGURATION CONFLICT</h2>
+                            <p class="block-sub" id="conflict-desc"></p>
+                        </div>
+                    </div>
+                    <div id="conflict-list" class="conflict-list"></div>
+                </div>
+
+                <!-- FINAL PROMPT -->
+                <div id="final-block" class="content-block hidden">
+                    <div class="block-header">
+                        <div class="block-icon icon-cyan">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                        </div>
+                        <div class="block-titles">
+                            <h2 class="block-title">SUPER PROMPT</h2>
+                            <p class="block-sub">Generated by VΛNTAGE FORGE</p>
+                        </div>
+                    </div>
+                    <div class="quality-panel" id="quality-panel">
+                        <div class="quality-header">
+                            <span class="quality-title">PROMPT QUALITY</span>
+                            <span class="quality-score" id="quality-overall">— %</span>
+                        </div>
+                        <div class="quality-bar-wrap"><div class="quality-bar" id="quality-bar"></div></div>
+                        <div class="quality-breakdown" id="quality-breakdown"></div>
+                        <div class="quality-warnings hidden" id="quality-warnings">
+                            <span class="quality-warn-title">WARNINGS</span>
+                            <ul id="quality-warnings-list"></ul>
+                        </div>
+                    </div>
+                    <div class="final-prompt-wrap">
+                        <div class="final-prompt-toolbar">
+                            <span class="final-prompt-label">FINAL PROMPT OUTPUT</span>
+                            <button id="edit-mode-btn" class="btn btn-xs" type="button">EDIT MODE</button>
+                        </div>
+                        <textarea id="final-prompt" readonly rows="18" aria-label="Final prompt"></textarea>
+                    </div>
+                    <div class="final-actions">
+                        <button id="copy-btn" class="btn btn-outline" type="button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                            COPY
+                        </button>
+                        <button id="download-txt-btn" class="btn btn-outline" type="button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            TXT
+                        </button>
+                        <button id="download-json-btn" class="btn btn-outline" type="button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            JSON
+                        </button>
+                        <button id="improve-btn" class="btn btn-outline" type="button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                            IMPROVE
+                        </button>
+                        <button id="regenerate-btn" class="btn btn-outline" type="button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+                            REGENERATE
+                        </button>
+                        <button id="save-history-btn" class="btn btn-primary" type="button">
+                            <span class="btn-label">SAVE TO HISTORY</span>
+                        </button>
+                    </div>
+                    <div id="diff-block" class="diff-block hidden">
+                        <div class="diff-header">
+                            <span class="diff-title">PROMPT DIFF</span>
+                            <div class="diff-legend">
+                                <span class="diff-added-l">+ Added</span>
+                                <span class="diff-removed-l">- Removed</span>
+                            </div>
+                        </div>
+                        <div class="diff-content" id="diff-content"></div>
+                    </div>
+                    <div id="gen-versions" class="gen-versions hidden">
+                        <span class="gen-versions-label">GENERATION HISTORY</span>
+                        <div class="gen-versions-list" id="gen-versions-list"></div>
+                    </div>
+                </div>
+
+            </div><!-- /main-feature -->
+        </section>
+
+        <!-- HISTORY -->
+        <section id="panel-history" class="panel" data-panel="history">
+            <div class="panel-header">
+                <div class="block-icon icon-cyan">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+                </div>
+                <div>
+                    <h2 class="block-title">PROMPT HISTORY</h2>
+                    <p class="block-sub">Previously generated prompts</p>
+                </div>
+            </div>
+            <div id="history-list" class="history-list">
+                <div class="empty-state">No history saved yet.</div>
+            </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section id="panel-settings" class="panel" data-panel="settings">
+            <div class="panel-header">
+                <div class="block-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                </div>
+                <div>
+                    <h2 class="block-title">SETTINGS</h2>
+                    <p class="block-sub">Application configuration</p>
+                </div>
+            </div>
+            <div class="settings-sections">
+                <div class="settings-group">
+                    <h3 class="settings-group-title">CONNECTION</h3>
+                    <div class="settings-row"><span class="settings-key">API Key Status</span><span class="settings-val" id="s-api-status">NOT SET</span></div>
+                    <div class="settings-row"><span class="settings-key">Model</span><span class="settings-val">deepseek/deepseek-chat</span></div>
+                    <div class="settings-row"><span class="settings-key">Endpoint</span><span class="settings-val">openrouter.ai</span></div>
+                </div>
+                <div class="settings-group">
+                    <h3 class="settings-group-title">VISUAL</h3>
+                    <div class="settings-row">
+                        <span class="settings-key">Background Video</span>
+                        <label class="toggle-switch"><input type="checkbox" id="s-bg-video" checked><span class="toggle-track"><span class="toggle-thumb"></span></span></label>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-key">Particle Effects</span>
+                        <label class="toggle-switch"><input type="checkbox" id="s-particles" checked><span class="toggle-track"><span class="toggle-thumb"></span></span></label>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-key">Reduced Motion</span>
+                        <label class="toggle-switch"><input type="checkbox" id="s-reduced-motion"><span class="toggle-track"><span class="toggle-thumb"></span></span></label>
+                    </div>
+                </div>
+                <div class="settings-group">
+                    <h3 class="settings-group-title">SECURITY STATUS</h3>
+                    <div class="settings-row"><span class="settings-key">Client Protection</span><span class="settings-val val-active">ACTIVE</span></div>
+                    <div class="settings-row"><span class="settings-key">Request Throttle</span><span class="settings-val val-active">ACTIVE</span></div>
+                    <div class="settings-row"><span class="settings-key">API Key Exposure</span><span class="settings-val val-warn">CLIENT-SIDE</span></div>
+                    <div class="settings-row"><span class="settings-key">Production Rec.</span><span class="settings-val val-warn">USE SERVER PROXY</span></div>
+                </div>
+                <div class="settings-group">
+                    <h3 class="settings-group-title">APPLICATION</h3>
+                    <div class="settings-row"><span class="settings-key">Version</span><span class="settings-val">1.0.0</span></div>
+                </div>
+                <div class="settings-group danger-zone">
+                    <h3 class="settings-group-title">DANGER ZONE</h3>
+                    <div class="settings-danger-actions">
+                        <button id="s-clear-key" class="btn btn-danger" type="button">CLEAR API KEY</button>
+                        <button id="s-clear-history" class="btn btn-danger" type="button">CLEAR HISTORY</button>
+                        <button id="s-reset-app" class="btn btn-danger" type="button">RESET APP</button>
+                    </div>
+                </div>
+                <div class="settings-note">
+                    <h3 class="settings-group-title">PRODUCTION SECURITY NOTE</h3>
+                    <p>API key berada di browser. Ini adalah deterrence, bukan keamanan absolut.</p>
+                    <pre class="arch-diagram">Frontend → Backend Proxy → OpenRouter</pre>
+                    <p>API key harus disimpan di server environment variable.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- TOAST -->
+<div id="toast-container" aria-live="assertive"></div>
+
+<!-- RATE LIMIT MODAL -->
+<div id="rate-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-box">
+        <div class="modal-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h3 class="modal-title">RATE LIMIT EXCEEDED</h3>
+        <p class="modal-body">Tunggu <strong id="rate-countdown">60</strong> detik.</p>
+        <button id="rate-modal-close" class="btn btn-outline" type="button">CLOSE</button>
+    </div>
+</div>
+
+<!-- CUSTOM REQ MODAL -->
+<div id="custom-req-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-box modal-wide">
+        <h3 class="modal-title">ADD CUSTOM REQUIREMENT</h3>
+        <div class="modal-form">
+            <div class="input-group"><label class="input-label" for="cr-title">Title</label><input type="text" id="cr-title" placeholder="e.g. Database Migration"></div>
+            <div class="input-group"><label class="input-label" for="cr-type">Type</label>
+                <select id="cr-type"><option value="requirement">Requirement</option><option value="constraint">Constraint</option><option value="preference">Preference</option><option value="context">Context</option></select>
+            </div>
+            <div class="input-group"><label class="input-label" for="cr-value">Description</label><textarea id="cr-value" rows="3" placeholder="Describe your requirement..."></textarea></div>
+            <div class="input-group"><label class="input-label" for="cr-priority">Priority</label>
+                <select id="cr-priority"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option></select>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button id="cr-cancel" class="btn btn-ghost" type="button">CANCEL</button>
+            <button id="cr-save" class="btn btn-primary" type="button">ADD REQUIREMENT</button>
+        </div>
+    </div>
+</div>
+
+<!-- HISTORY MODAL -->
+<div id="history-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-box modal-wide modal-tall">
+        <h3 class="modal-title" id="hm-title"></h3>
+        <p class="modal-meta" id="hm-time"></p>
+        <div class="hm-section"><span class="input-label">BASE PROMPT</span><div class="hm-text" id="hm-base"></div></div>
+        <div class="hm-section"><span class="input-label">FINAL PROMPT</span><textarea id="hm-final" readonly rows="12"></textarea></div>
+        <div class="hm-section hidden" id="hm-versions-section"><span class="input-label">GENERATIONS</span><div id="hm-versions"></div></div>
+        <div class="modal-actions">
+            <button class="btn btn-outline hm-copy" type="button">COPY</button>
+            <button class="btn btn-outline hm-use" type="button">USE AS BASE</button>
+            <button class="btn btn-ghost hm-close" type="button">CLOSE</button>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
